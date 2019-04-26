@@ -3,8 +3,9 @@
 #include "U8glib.h"
 #define SEALEVELPRESSURE_HPA (1013.25)
         Adafruit_BME280 bme; 
-
-
+#define PIN 3    
+#include "GyverButton.h"
+GButton butt1(PIN);
 #include <iarduino_RTC.h>
 iarduino_RTC time(RTC_DS3231);
 
@@ -13,7 +14,7 @@ SoftwareSerial mySerial(5, 4);
 //unsigned long timer=0;
 int count=0;
 
-
+int value = 0;
 int mq2=0;
 int mq9=0;
 int mq135=0;
@@ -76,9 +77,15 @@ void setup(void) {
   time.begin();
    mp3_play (200);
    delay(2400);
+
+    butt1.setDebounce(50);        // настройка антидребезга (по умолчанию 80 мс)
+    butt1.setTimeout(300);        // настройка таймаута на удержание (по умолчанию 500 мс)
+    butt1.setClickTimeout(300);   // настройка таймаута между кликами (по умолчанию 300 мс)
+    butt1.setType(HIGH_PULL);
+     butt1.setDirection(NORM_OPEN);
 }
 void loop(void) {
-  
+  butt1.tick(); 
   u8g.firstPage();  
   do {
     draw();
@@ -86,11 +93,11 @@ void loop(void) {
 
 
   getmq();
-  delay(1000);
+  //delay(500);
    //mp3_play (1);
 
     //if (time.Hours == 9 && time.minutes == 0) 
-    run_platon();
+     if (butt1.isClick()) run_platon();
 }
 
 void run_platon(){
